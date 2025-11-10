@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "name": "portfolder.zip",
+  "items": [
+    "portname.sh",
+    "portfolder"
+  ],
+  "attr": {
+    "title": "Fancy Name",
+    "desc": "Game description",
+    "genres": [],
+    "rtr": false,
+    "exp": false,
+    "runtime": [],
+    "availability": "paid",
+    "reqs": [],
+    "arch": [
+      "aarch64"
+    ],
+    "min_glibc": ""
+  }
+}
