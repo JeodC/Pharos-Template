@@ -33,7 +33,7 @@ Port/
 ```
 Bottle/
   ├── bottle/
-  │   ├── bottle.json         # REQUIRED
+  │   ├── bottle.json       # REQUIRED
   │   ├── gameinfo.xml      # Optional metadata for EmulationStation
   │   ├── README.md         # Instructions
   │   ├── screenshot.png    # REQUIRED
