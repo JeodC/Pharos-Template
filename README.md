@@ -14,7 +14,7 @@ This repository is a template intended to be forked and used as a base for your 
 
 You can set up a GitHub pages website to display your releases in a user-friendly browser page. An example website backend exists at https://github.com/JeodC/RHH-Ports/tree/main/docs.
 
-## Optional Metadata
+## Metadata
 
 Your port will go through Pharos's autoinstaller, which means you can (and should) include metadata for maximum accessibility! Each port or bottle should be packaged like this:
 
