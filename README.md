@@ -5,7 +5,7 @@ This repository is a template intended to be forked and used as a base for your 
 - `.github/workflows`
   - In here you will find a sample screenshot collector. It will collect all screenshot image files it finds and bundle them into one `images.zip` release, which Pharos will pull and unzip for local screenshot rendering.
   - You will also find a sample YAML to generate port or bottle releases. This will run every 12 hours or when there's a change in `ports/*` or `bottles/*`. You can modify this easily to change where your released ports/bottles live. You may also wish to store `ports.json` or `winecask.json` in a `docs/` folder. If you do, you will need to modify the YAML.
-    - You will need to generate a GitHub Personal Access Token and apply it to your repository as `TOKEN` to the workflow can remove old zip files from existing releases.
+    - You will need to generate a GitHub Personal Access Token and apply it to your repository as `TOKEN` so the workflow can remove old zip files from existing releases.
     - Pharos is designed with a one repository, one purpose rule. You should not mix ports with bottles or have a ports.json and winecask.json present in the same repository.
 - `ports/` or `bottles/`
   - The centralized location for your ports/bottles. You can add subfolders for better organization, for example `released` and `WIP`.
