@@ -47,4 +47,4 @@ Each port/bottle must have a `port.json`/`bottle.json` file and a screenshot in 
 
 ## Use with Pharos
 
-Pharos App is designed to link with github repositories matching the above structure. Once you've established your repository, add its URL to Pharos' `.sources` file and load the app to verify it works.
+[Pharos App](https://github.com/JeodC/RHH-Ports/tree/main/ports/released/apps/pharos) is designed to link with github repositories matching the above structure. Once you've established your repository, add its URL to Pharos' `.sources` file and load the app to verify it works.
