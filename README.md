@@ -1,59 +1,60 @@
 # Pharos Ports Template Repository
 
-This repository is a template intended to be forked and used as a base for your own ports or wine bottles repository. The structure is:
+A starting point for hosting your own ports or wine bottles, on the same setup [RHH-Ports](https://github.com/JeodC/RHH-Ports) runs on. Fork it, add your ports, and the workflows publish releases that [Pharos](https://github.com/JeodC/RHH-Ports/tree/main/ports/released/apps/pharos) and stock PortMaster can install from. Once the first release is out, add your repository's URL to Pharos' `.sources` file and open the app to check your ports show up.
 
-- `.github/workflows`
-  - In here you will find a sample screenshot collector. It will collect all screenshot image files it finds and bundle them into one `images.zip` release, which Pharos will pull and unzip for local screenshot rendering. (Ports repositories also get an `images.zip` on `ports-latest` from the PortMaster catalog step, which Pharos prefers — the standalone collector mainly matters for bottles repositories.)
-  - You will also find a sample YAML to generate port or bottle releases. This will run every 12 hours or when there's a change in `ports/*` or `bottles/*`. You can modify this easily to change where your released ports/bottles live. You may also wish to store `ports.json` or `winecask.json` in a `docs/` folder. If you do, you will need to modify the YAML.
-    - The workflows authenticate with the built-in `GITHUB_TOKEN` (granted `contents: write` in each workflow), so no Personal Access Token setup is required.
-    - Pharos is designed with a one repository, one purpose rule. You should not mix ports with bottles or have a ports.json and winecask.json present in the same repository.
-- `ports/` or `bottles/`
-  - The centralized location for your ports/bottles. You can add subfolders for better organization, for example `released` and `WIP`.
+Pharos follows a one repository, one purpose rule. Don't mix ports with bottles, or keep a `ports.json` and a `winecask.json` in the same repository.
 
-## Optional PortMaster Integration
+## Layout
 
-The Release Ports workflow also publishes a [PortMasterV3](https://portmaster.games/) catalog to the `ports-latest` release: a PortMaster-format `ports.json`, an `images.zip` of screenshots, and a `<name>.source.json` file. Users who copy that source file into their device's `PortMaster/config/` folder can browse and install your ports from stock PortMaster in addition to Pharos.
+- `ports/released/` or `bottles/released/` holds what gets published. Subfolders are fine, e.g. by genre or engine. Work in progress goes outside `released/`.
+- `templates/` has a starter `port.json` and `bottle.json`.
+- `.github/workflows/`
+  - **Release Ports** and **Generate Bottles** zip whatever changed, upload it to a release, and update `docs/ports.json` or `docs/winecask.json`. They run every 12 hours, on pushes to `released/`, or by hand. A forced run re-zips everything.
+  - **Generate Screenshots ZIP** bundles every screenshot into `images.zip` for Pharos. Ports repositories also get an `images.zip` from the PortMaster catalog step, which Pharos prefers, so this one mostly matters for bottles.
+  - All of them use the built-in `GITHUB_TOKEN`. No Personal Access Token is needed.
 
-- The source file is generated automatically from your repository name. To customize the prefix or display name, commit your own `docs/<prefix>.source.json` and the workflow will upload that instead.
-- Ports may declare runtimes via `attr.runtime` in `port.json` (e.g. `["weston_pack.squashfs"]`). Runtimes hosted by official PortMaster are referenced automatically. A custom runtime must be committed to a `runtimes/` folder (so the catalog can hash it) and uploaded as an asset on a `runtimes-latest` release.
-- Bottles are Pharos-only; the PortMaster catalog covers ports.
-- The step skips itself when `docs/ports.json` is empty, so bottles-only repositories are unaffected.
+Release Ports only checks out port metadata, then pulls in the ports it zips. If you move your ports out of `ports/released/`, update its `sparse-checkout` paths too.
 
-## Optional GitHub Pages
+## Packaging
 
-You can set up a GitHub pages website to display your releases in a user-friendly browser page. An example website backend exists at https://github.com/JeodC/RHH-Ports/tree/main/docs.
-
-## Metadata
-
-Your port will go through Pharos's autoinstaller, which means you can (and should) include metadata for maximum accessibility! Each port or bottle should be packaged like this:
+Each port or bottle is a launcher next to a folder holding its metadata:
 
 ```
 Port/
   ├── port/
-  │   ├── port.json         # REQUIRED
-  │   ├── gameinfo.xml      # Optional metadata for EmulationStation
-  │   ├── README.md         # Instructions
-  │   ├── screenshot.png    # REQUIRED
-  │   ├── cover.png         # Optional cover artwork
+  │   ├── port.json         # required
+  │   ├── screenshot.png    # required
+  │   ├── README.md         # instructions
+  │   ├── cover.png         # optional cover art
+  │   ├── gameinfo.xml      # optional EmulationStation metadata
   │   └── other port files
   └── Port.sh
 ```
 
-```
-Bottle/
-  ├── bottle/
-  │   ├── bottle.json       # REQUIRED
-  │   ├── gameinfo.xml      # Optional metadata for EmulationStation
-  │   ├── README.md         # Instructions
-  │   ├── screenshot.png    # REQUIRED
-  │   ├── cover.png         # Optional cover artwork
-  │   └── other bottle files
-  └── Bottle.sh
-```
+Bottles have the same shape, with `bottle.json`. Anything missing its json or a screenshot is skipped.
 
-Each port/bottle must have a `port.json`/`bottle.json` file and a screenshot in order to be validated as a port/bottle. Examples for each are included in this template repository.
+In `port.json`:
 
+- `name` becomes the zip's file name. Stick to letters, numbers, `.`, `_` and `-`--GitHub strips anything else from release asset names, and the download 404s.
+- `porter` lists everyone who made the port possible. When you build on someone else's port, keep their names.
+- `store` takes `{"name": "Steam", "gameurl": "https://store.steampowered.com/app/<appid>/", "developerurl": ""}` entries. A Steam link also turns on [sale badges](#discounts).
 
-## Use with Pharos
+## PortMaster
 
-[Pharos App](https://github.com/JeodC/RHH-Ports/tree/main/ports/released/apps/pharos) is designed to link with github repositories matching the above structure. Once you've established your repository, add its URL to Pharos' `.sources` file and load the app to verify it works.
+Release Ports also publishes a [PortMasterV3](https://portmaster.games/) catalog to `ports-latest`: a PortMaster-format `ports.json`, an `images.zip` of screenshots, and a `.source.json` file. Copying that file into `PortMaster/config/` on a device adds your ports to stock PortMaster.
+
+- The source file's prefix and display name come from your repository name. Commit a `docs/<name>.source.json` to set them yourself.
+- PortMaster reads source files in file name order, and when two sources offer a port with the same name, the first one wins. The official ones are `020_portmaster.source.json` and `021_portmaster.multiverse.source.json`. Name yours `010_<prefix>.source.json` and your versions win; anything sorting after them and PortMaster's do. Tell your users which.
+- Ports can declare runtimes in `attr.runtime`, e.g. `["weston_pack.squashfs"]`. Official PortMaster runtimes are referenced automatically. A custom one has to be committed to `runtimes/`, so the catalog can hash it, and uploaded to a `runtimes-latest` release.
+- Bottles are Pharos-only. The catalog step is skipped when `docs/ports.json` is empty.
+
+## GitHub Pages
+
+[RHH-Ports' `docs/`](https://github.com/JeodC/RHH-Ports/tree/main/docs) is a working site to copy. It reads `docs/ports.json` and shows download counts, recent updates and sales. Download counts come from `lifetime_downloads`, which Release Ports keeps per port, plus the live count on the release.
+
+## Discounts
+
+Ports with a Steam link in `store` show live sale percentages. The prices come from [IsThereAnyDeal](https://isthereanydeal.com/), through a [Cloudflare Worker](https://workers.cloudflare.com/) RHH-Ports runs at `https://rhh-ports-discounts.jeodc.workers.dev/`.
+
+- **Pharos** checks every port in every repository it loads against that Worker, so your ports get sale badges and the "On Sale" view with no setup.
+- **A Pages site** needs a separate Worker, since this one only answers browser requests from `jeodc.github.io`. Cloudflare's free tier and an IsThereAnyDeal API key cover it. It takes `?appids=<id>,<id>&country=US` and returns `{"<appid>": {"<shop>": {"cut": <percent>, "url": "<link>"}}}`. Point `DISCOUNT_API_URL` in `loadports.js` at it.
